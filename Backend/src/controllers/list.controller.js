@@ -24,7 +24,7 @@ export const showLists = async(req,res) => {
     if(!board){
         return res.json({e:"Board does not exist"})
     }
-    const list = await List.find({board_id})
+    const list = await List.find({board_id}).sort("position")
     if(!list){
         return res.json({e:"No list exists"})
     }
