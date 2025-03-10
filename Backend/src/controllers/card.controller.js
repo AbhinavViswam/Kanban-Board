@@ -14,7 +14,7 @@ export const getAllCards = async (req, res) => {
 export const createCard = async (req, res) => {
     const list_id = req.params.listId
     const { title, description, position } = req.body
-    if (!title || position==undefined) {
+    if (!title || position===undefined) {
         return res.json({ e: "Title and position are required" })
     }
     const list = await List.findById(list_id)
@@ -53,17 +53,21 @@ export const deleteCard = async (req, res) => {
 
 export const moveCard = async (req, res) => {
     const { newListId, newPosition } = req.body
-    if (!newListId || newPosition === undefined) {
-        return res.json({ error: "New list ID and position are required" });
+    if (!newListId || newPosition===undefined){
+        return res.json({e:"New list ID and position are required"});
     }
     const listExists = await List.findById(newListId);
-    if (!listExists) return res.json({ error: "New list not found" })
+    if (!listExists){
+        return res.json({e:"New list not found"})
+    }
     const updatedCard = await Card.findByIdAndUpdate(
         req.params.id,
         {list_id:newListId, position: newPosition},
         {new:true}
     );
-    if (!updatedCard) return res.json({ error: "Card not found" });
+    if (!updatedCard){
+        return res.json({e:"Card not found"});
+    } 
 
     res.json(updatedCard);
 }

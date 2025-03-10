@@ -1,5 +1,6 @@
 import express from "express"
 import dotenv from "dotenv"
+import cors from "cors"
 
 import { connectDB } from "./db.js";
 import boardRouter from "./routes/board.route.js"
@@ -14,6 +15,7 @@ const port = process.env.PORT
 
 app.use(express.urlencoded({extended:true}))
 app.use(express.json())
+app.use(cors())
 
 app.use("/api",boardRouter)
 app.use("/api",listRouter)
