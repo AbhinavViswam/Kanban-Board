@@ -65,7 +65,7 @@ function List() {
             <div className="flex overflow-x-auto space-x-4 pb-4">
                 {lists.length ? (
                     lists.map((l) => (
-                        <div key={l._id} className="bg-blue-50 shadow-md p-5 rounded-lg w-64 min-w-64 h-screen flex flex-col">
+                        <div key={l._id} className="bg-blue-50 shadow-md p-5 rounded-lg w-80 min-w-80 h-screen flex flex-col">
                             {editListId === l._id ? (
                                 <form onSubmit={(e) => handleRename(e, l._id)} className="mb-3 flex">
                                     <input
