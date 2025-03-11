@@ -1,7 +1,6 @@
 import {BrowserRouter, Route,Routes} from "react-router-dom"
 import Board from "../components/Board"
 import List from  "../components/List"
-import Card from "../components/Card"
 
 import React from 'react'
 
@@ -11,7 +10,6 @@ function AppRoute() {
    <Routes>
     <Route path="/" element={<Board/>}/>
     <Route path="/list" element={<List/>}/>
-    <Route path="/card" element={<Card/>}/>
    </Routes>
    </BrowserRouter>
   )
