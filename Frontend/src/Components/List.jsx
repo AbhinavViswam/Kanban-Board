@@ -10,20 +10,19 @@ function List() {
     const [editListId, setEditListId] = useState(null);
     const [editTitle, setEditTitle] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [refreshKey, setRefreshKey] = useState(0); // Forces re-render
+    const [refreshKey, setRefreshKey] = useState(0); 
 
-    // Fetch all lists
     const fetchLists = async () => {
         try {
             const res = await axios.get(`/api/boards/${boardId}/lists`);
             setLists(res.data.list);
-            setRefreshKey(prevKey => prevKey + 1); // Force re-render
+            setRefreshKey(prevKey => prevKey + 1); 
         } catch (error) {
             console.error("Error fetching lists:", error);
         }
     };
 
-    // Format timestamps
+   
     const formatDate = (timestamp) => {
         if (!timestamp) return "Unknown Date";
         return new Intl.DateTimeFormat("en-US", {
@@ -36,7 +35,7 @@ function List() {
         }).format(new Date(timestamp));
     };
 
-    // Add new list
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -49,7 +48,7 @@ function List() {
         }
     };
 
-    // Rename a list
+    
     const handleRename = async (e, listId) => {
         e.preventDefault();
         try {
@@ -62,7 +61,7 @@ function List() {
         }
     };
 
-    // Fetch lists on mount and when boardId changes
+    
     useEffect(() => {
         if (boardId) {
             fetchLists();
@@ -80,8 +79,6 @@ function List() {
                     + Add List
                 </button>
             </div>
-
-            {/* Lists Display */}
             <div className="flex overflow-x-auto space-x-4 pb-4">
                 {lists.length ? (
                     lists.map((l) => (
@@ -118,7 +115,7 @@ function List() {
                                     </button>
                                 </div>
                             )}
-                            {/* Pass fetchLists to ensure updates after move */}
+                          
                             <Card listID={l._id} fetchLists={fetchLists} />
                         </div>
                     ))
@@ -127,7 +124,7 @@ function List() {
                 )}
             </div>
 
-            {/* Add List Modal */}
+          
             {isModalOpen && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg w-96">

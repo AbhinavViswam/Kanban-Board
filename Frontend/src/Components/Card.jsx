@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import axios from "../Config/axios";
 import { BoardContext } from "../context/BoardContext";
 
-function Card({ listID , fetchLists}) {
+function Card({ listID, fetchLists }) {
     const { boardId } = useContext(BoardContext);
     const [cards, setCards] = useState([]);
     const [editCardId, setEditCardId] = useState(null);
@@ -49,13 +49,12 @@ function Card({ listID , fetchLists}) {
         setEditTitle("");
         setEditDescription("");
         fetchCards();
-        // fetchLists();
     };
 
     const handleDelete = async (cardId) => {
         await axios.delete(`/api/cards/${cardId}`);
         fetchCards();
-        // fetchLists();
+
     };
 
     const handleAddCard = async (e) => {
@@ -69,14 +68,14 @@ function Card({ listID , fetchLists}) {
         setDesc("");
         setIsModalOpen(false);
         fetchCards();
-        // fetchLists()
+
     };
 
     const handleMove = async (e) => {
         e.preventDefault();
-        await axios.put(`/api/cards/${moveCardId}/move`,{
-            newListId:`${moveTo}`,
-            newPosition:0
+        await axios.put(`/api/cards/${moveCardId}/move`, {
+            newListId: `${moveTo}`,
+            newPosition: 0
         })
         fetchCards();
         fetchLists();
@@ -178,25 +177,25 @@ function Card({ listID , fetchLists}) {
                                             <p className="text-gray-600">{c.description}</p>
                                             <p className="text-gray-400 text-sm">{formatDate(c.createdAt)}</p>
                                             <form className="mt-2 flex items-center space-x-2" onSubmit={handleMove}>
-    <select
-        className="border p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-        onChange={(e) => setMoveTo(e.target.value)}
-    >
-        <option value={null}>Move To</option>
-        {lists.map((l, i) => (
-            <option value={l._id} key={i}>
-                {l.title}
-            </option>
-        ))}
-    </select>
-    <button
-        type="submit"
-        onClick={() => setMoveCardId(c._id)}
-        className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition duration-300"
-    >
-        Move
-    </button>
-</form>
+                                                <select
+                                                    className="border p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                                    onChange={(e) => setMoveTo(e.target.value)}
+                                                >
+                                                    <option value={null}>Move To</option>
+                                                    {lists.map((l, i) => (
+                                                        <option value={l._id} key={i}>
+                                                            {l.title}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                                <button
+                                                    type="submit"
+                                                    onClick={() => setMoveCardId(c._id)}
+                                                    className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition duration-300"
+                                                >
+                                                    Move
+                                                </button>
+                                            </form>
 
                                         </div>
                                         <div className="space-x-2">
