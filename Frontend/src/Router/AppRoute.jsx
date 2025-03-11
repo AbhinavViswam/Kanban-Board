@@ -3,7 +3,6 @@ import Board from "../components/Board"
 import List from  "../components/List"
 
 import React from 'react'
-
 function AppRoute() {
   return (
    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
