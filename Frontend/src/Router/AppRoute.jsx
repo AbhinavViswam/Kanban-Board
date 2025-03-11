@@ -1,6 +1,6 @@
 import {BrowserRouter, Route,Routes} from "react-router-dom"
-import Board from "../components/Board"
-import List from  "../components/List"
+import Board from "../Components/Board"
+import List from  "../Components/List"
 
 import React from 'react'
 function AppRoute() {
