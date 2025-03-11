@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "../Config/axios";
+import { BoardContext } from "../context/BoardContext";
 
-function Card({ listID }) {
+function Card({ listID , fetchLists}) {
+    const { boardId } = useContext(BoardContext);
     const [cards, setCards] = useState([]);
     const [editCardId, setEditCardId] = useState(null);
     const [editTitle, setEditTitle] = useState("");
@@ -9,12 +11,20 @@ function Card({ listID }) {
     const [title, setTitle] = useState("");
     const [desc, setDesc] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [lists, setLists] = useState([]);
+    const [moveTo, setMoveTo] = useState(null);
+    const [moveCardId, setMoveCardId] = useState(null)
 
     const fetchCards = async () => {
         if (listID) {
             const res = await axios.get(`/api/lists/${listID}/cards`);
             setCards(res.data.card);
         }
+    };
+
+    const fetchListsForCards = async () => {
+        const res = await axios.get(`/api/boards/${boardId}/lists`);
+        setLists(res.data.list);
     };
 
     const formatDate = (timestamp) => {
@@ -39,11 +49,13 @@ function Card({ listID }) {
         setEditTitle("");
         setEditDescription("");
         fetchCards();
+        // fetchLists();
     };
 
     const handleDelete = async (cardId) => {
         await axios.delete(`/api/cards/${cardId}`);
         fetchCards();
+        // fetchLists();
     };
 
     const handleAddCard = async (e) => {
@@ -51,13 +63,28 @@ function Card({ listID }) {
         await axios.post(`/api/lists/${listID}/cards`, {
             title,
             description: desc,
-            position: 0
+            position: 0,
         });
         setTitle("");
         setDesc("");
         setIsModalOpen(false);
         fetchCards();
+        // fetchLists()
     };
+
+    const handleMove = async (e) => {
+        e.preventDefault();
+        await axios.put(`/api/cards/${moveCardId}/move`,{
+            newListId:`${moveTo}`,
+            newPosition:0
+        })
+        fetchCards();
+        fetchLists();
+    }
+
+    useEffect(() => {
+        fetchListsForCards();
+    }, []);
 
     useEffect(() => {
         fetchCards();
@@ -65,9 +92,8 @@ function Card({ listID }) {
 
     return (
         <div className="relative flex flex-col">
-    
-            <button 
-                onClick={() => setIsModalOpen(true)} 
+            <button
+                onClick={() => setIsModalOpen(true)}
                 className="bg-blue-500 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-600 transition duration-300"
             >
                 ➕ Add Card
@@ -92,15 +118,15 @@ function Card({ listID }) {
                                 className="w-full p-2 border rounded-md focus:outline-none"
                             ></textarea>
                             <div className="flex justify-end space-x-2">
-                                <button 
-                                    type="button" 
-                                    onClick={() => setIsModalOpen(false)} 
+                                <button
+                                    type="button"
+                                    onClick={() => setIsModalOpen(false)}
                                     className="bg-gray-400 text-white px-3 py-1 rounded-md"
                                 >
                                     Cancel
                                 </button>
-                                <button 
-                                    type="submit" 
+                                <button
+                                    type="submit"
                                     className="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600 transition duration-300"
                                 >
                                     ✅ Add
@@ -110,11 +136,12 @@ function Card({ listID }) {
                     </div>
                 </div>
             )}
+
             <div className="max-h-[70vh] overflow-y-auto p-2 mt-3">
                 {cards.length ? (
                     <div className="space-y-4">
                         {cards.map((c) => (
-                            <div key={c._id} className="bg-white shadow-md p-4 rounded-lg">
+                            <div key={c._id} className="bg-white shadow-md p-4 rounded-lg border border-red-200">
                                 {editCardId === c._id ? (
                                     <form onSubmit={(e) => handleUpdate(e, c._id)} className="space-y-2">
                                         <input
@@ -150,6 +177,27 @@ function Card({ listID }) {
                                             <h1 className="text-lg font-bold text-gray-800">{c.title}</h1>
                                             <p className="text-gray-600">{c.description}</p>
                                             <p className="text-gray-400 text-sm">{formatDate(c.createdAt)}</p>
+                                            <form className="mt-2 flex items-center space-x-2" onSubmit={handleMove}>
+    <select
+        className="border p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+        onChange={(e) => setMoveTo(e.target.value)}
+    >
+        <option value={null}>Move To</option>
+        {lists.map((l, i) => (
+            <option value={l._id} key={i}>
+                {l.title}
+            </option>
+        ))}
+    </select>
+    <button
+        type="submit"
+        onClick={() => setMoveCardId(c._id)}
+        className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition duration-300"
+    >
+        Move
+    </button>
+</form>
+
                                         </div>
                                         <div className="space-x-2">
                                             <button

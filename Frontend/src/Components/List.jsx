@@ -10,12 +10,20 @@ function List() {
     const [editListId, setEditListId] = useState(null);
     const [editTitle, setEditTitle] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [refreshKey, setRefreshKey] = useState(0); // Forces re-render
 
+    // Fetch all lists
     const fetchLists = async () => {
-        const res = await axios.get(`/api/boards/${boardId}/lists`);
-        setLists(res.data.list);
+        try {
+            const res = await axios.get(`/api/boards/${boardId}/lists`);
+            setLists(res.data.list);
+            setRefreshKey(prevKey => prevKey + 1); // Force re-render
+        } catch (error) {
+            console.error("Error fetching lists:", error);
+        }
     };
 
+    // Format timestamps
     const formatDate = (timestamp) => {
         if (!timestamp) return "Unknown Date";
         return new Intl.DateTimeFormat("en-US", {
@@ -28,22 +36,33 @@ function List() {
         }).format(new Date(timestamp));
     };
 
+    // Add new list
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await axios.post(`/api/boards/${boardId}/lists`, { title: list });
-        setList("");
-        setIsModalOpen(false);
-        fetchLists();
+        try {
+            await axios.post(`/api/boards/${boardId}/lists`, { title: list });
+            setList("");
+            setIsModalOpen(false);
+            fetchLists();
+        } catch (error) {
+            console.error("Error adding list:", error);
+        }
     };
 
+    // Rename a list
     const handleRename = async (e, listId) => {
         e.preventDefault();
-        await axios.put(`/api/lists/${listId}`, { title: editTitle });
-        setEditListId(null);
-        setEditTitle("");
-        fetchLists();
+        try {
+            await axios.put(`/api/lists/${listId}`, { title: editTitle });
+            setEditListId(null);
+            setEditTitle("");
+            fetchLists();
+        } catch (error) {
+            console.error("Error renaming list:", error);
+        }
     };
 
+    // Fetch lists on mount and when boardId changes
     useEffect(() => {
         if (boardId) {
             fetchLists();
@@ -62,10 +81,11 @@ function List() {
                 </button>
             </div>
 
+            {/* Lists Display */}
             <div className="flex overflow-x-auto space-x-4 pb-4">
                 {lists.length ? (
                     lists.map((l) => (
-                        <div key={l._id} className="bg-blue-50 shadow-md p-5 rounded-lg w-80 min-w-80 h-screen flex flex-col">
+                        <div key={`${l._id}-${refreshKey}`} className="border border-gray-300 bg-blue-50 shadow-md p-5 rounded-lg w-80 min-w-80 h-screen flex flex-col">
                             {editListId === l._id ? (
                                 <form onSubmit={(e) => handleRename(e, l._id)} className="mb-3 flex">
                                     <input
@@ -84,8 +104,8 @@ function List() {
                             ) : (
                                 <div className="flex justify-between items-center mb-3">
                                     <div className="flex flex-col items-center justify-center">
-                                    <h1 className="text-lg font-bold text-gray-800">{l.title}</h1>
-                                    <h6 className="text-sm text-gray-500">{formatDate(l.createdAt)}</h6>
+                                        <h1 className="text-lg font-bold text-gray-800">{l.title}</h1>
+                                        <h6 className="text-sm text-gray-500">{formatDate(l.createdAt)}</h6>
                                     </div>
                                     <button
                                         onClick={() => {
@@ -98,7 +118,8 @@ function List() {
                                     </button>
                                 </div>
                             )}
-                            <Card listID={l._id} />
+                            {/* Pass fetchLists to ensure updates after move */}
+                            <Card listID={l._id} fetchLists={fetchLists} />
                         </div>
                     ))
                 ) : (
@@ -106,6 +127,7 @@ function List() {
                 )}
             </div>
 
+            {/* Add List Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg w-96">
